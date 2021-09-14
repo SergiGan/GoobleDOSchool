@@ -11,45 +11,43 @@
 #         |->   $record-date/ddmmyyyy on "*****"
 #
 
-# Announcement of variables:
+# Announcement of variables, No Spaces Between Characters " = " in var :
 
-  $username 		  = 'gooml@domain.name';
-  $record-date 		  = `date +%d%m%y`;
-  $md5hash_of_record-date = echo -n $record-date | md5sum;
-  $access_log  		  = 'find /var/log/nginx/access.log -mtime ';
-  $folder_otherLogs 	  = [/'var/log/nginx/']; 	  # path depend from version or /var/log/nginx/*
+   username 	    = "gooml@domain.name";
+   record-date	    = `date +%d:%m:%Y`;
+   md5hash_of_record-date = echo -n $username | md5sum;
+   access_log  	    = find /var/log/nginx/ -name access.log -mmin -15;
+   folder_otherLogs = '/var/log/nginx/*'; 	                      # path depend from version nginx.
 
 
 # 1.Removing strings format in the file access.log, that consist the local_ip_address and archived them,
 
-  $last15Access_Log = find $folder_otherLogs -name "access.log" -mmin -15; 
+  last15Access_Log = find $folder_otherLogs -name "access.log" -mmin -15; 
    
   sed -i 's/127.0.0.100 ; 192.168.0.100/ /g' $last15Access_log | tar cvzf `backup_ALogs$record-date`.tar.gz $last15Access_log;
    
 # 2.Adding last finding otherlogs to archive:
 
-  $otherLogs = $(find $folder_otherLogs -name "*.log" -mmin -360 --exclude="access.log");
+  otherLogs = $(find $folder_otherLogs -name "*.log" -mmin -360 --exclude="access.log");
      
   sed -i 's/127.0.0.100 ; 192.168.0.100/ /g' $folder_otherLogs | tar cvzf `backup_OLogs$record-date`.tar.gz $folder_otherLogs;
    
 # 2.Renaming the substrings format:
-  # замінити підрядки формату "$md5hash_of_record-date$username", де record-date у форматі ddmmyy,
-  # а username — "2-3symbols@domain.name", на "*****"
+  # Replace substrings of format "$md5hash_of_record-date$username", where record-date in format ddmmyy,
+  # the username вЂ” "2-3symbols@domain.name", on "*****"
 
   echo sed -i '/$md5hash_of_record-date$username/*****/g' $folder_otherLogs; 
 
-
-
-# LogsCaput: to choose as variant after backup and sending logs to store,
+  # LogsCaput: to choose as variant after backup and sending logs to store,
                 
 	> /var/log/nginx/access.log;
 	> /var/log/nginx/[custom.log, seo.log, error.log, chunga.log];
-        rm -rf /backup/"some_name".tar.gz;
-        find /var/log/nginx/ -name "*gz" | xargs -i rm {} ; 
+          rm -rf /backup/"some_name".tar.gz;
+          find /var/log/nginx/ -name "*gz" | xargs -i rm {} ; 
 
-# To connect via ssh needs to use PuTTY
-# To manipulating with logs needs to root-permisions
+  # To connect via ssh needs to use PuTTY
+  # To manipulating with logs needs to root-permisions
 				
 
 #*******************************************************************************************
-#/tmp/rotateLogs.sh[+] [unix] (21:41 12/09/2021)
+#/tmp/rotateLogs.sh[+] [unix] (22:41 12/09/2021)
