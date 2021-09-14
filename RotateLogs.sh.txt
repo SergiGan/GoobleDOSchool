@@ -45,7 +45,11 @@
 	> /var/log/nginx/access.log;
 	> /var/log/nginx/[custom.log, seo.log, error.log, chunga.log];
         rm -rf /backup/"some_name".tar.gz;
-        find /var/log/nginx/ -name "*gz" | xargs -i rm {} ; 				
+        find /var/log/nginx/ -name "*gz" | xargs -i rm {} ; 
+
+# To connect via ssh needs to use PuTTY
+# To manipulating with logs needs to root-permisions
+				
 
 #*******************************************************************************************
 #/tmp/rotateLogs.sh[+] [unix] (21:41 12/09/2021)
