@@ -1,0 +1,52 @@
+!#/bin/bash sh
+
+# Main files. Access.log custom.log, seo.log, error.log, chunga.log
+# 4) Logs should be archived and cleaned every 15 minutes for access.log, and for the others - once per day at 3.00 am.
+# 3) At  the specified time, logs must be archived and for checking, + stored the last 10 versions.
+# 2) In  this case, the name of files must contain the date of creation of an archive;
+#    1a) Before archiving:
+# 1)    - Clearing strings with some local ip address;
+#       - Replace the substrings of the next format: "$md5hash_of_record-date$username",
+#         |     $md5hash - generate,$username - the user's name is arbitrary, for example '2-3symbols@domain.name',
+#         |->   $record-date/ddmmyyyy on "*****"
+#
+
+# Announcement of variables:
+
+  $username 		  = 'gooml@domain.name';
+  $record-date 		  = `date +%d%m%y`;
+  $md5hash_of_record-date = echo -n $record-date | md5sum;
+  $access_log  		  = 'find /var/log/nginx/access.log -mtime ';
+  $folder_otherLogs 	  = [/'var/log/nginx/']; 	  # path depend from version or /var/log/nginx/*
+
+
+# 1.Removing strings format in the file access.log, that consist the local_ip_address and archived them,
+
+  $last15Access_Log = find $folder_otherLogs -name "access.log" -mmin -15; 
+   
+   sed -i 's/127.0.0.100 ; 192.168.0.100/ /g' $last15Access_log | tar cvzf `backup_ALogs$record-date`.tar.gz $last15Access_log;
+   
+   
+# 2.Renaming the substrings format:
+  # зам≥нити п≥др€дки формату "$md5hash_of_record-date$username", де record-date у формат≥ ddmmyy,
+  # а username Ч "2-3symbols@domain.name", на "*****"
+
+    echo sed -i '/$md5hash_of_record-date$username/*****/g' $folder_otherLogs; 
+
+
+# 2.Adding last finding otherlogs to archive:
+
+    $otherLogs = $(find $folder_otherLogs -name "*.log" -mmin -360 --exclude="access.log");
+     
+     sed -i 's/127.0.0.100 ; 192.168.0.100/ /g' $folder_otherLogs | tar cvzf `backup_OLogs$record-date`.tar.gz $folder_otherLogs;
+
+# LogsCaput to choose as variant and Sending logs to store after backup:
+        cd / | du -sh * | sort -h ;
+        find /var/log/nginx/ -name "*gz" | xargs -i rm {} ;
+	> /var/log/nginx/access.log;
+	> /var/log/nginx/[custom.log, seo.log, error.log, chunga.log];
+        rm -rf /backup/"some_name".tar.gz;
+         				
+
+#*******************************************************************************************
+#/tmp/rotateLogs.sh[+] [unix] (21:41 12/09/2021)
