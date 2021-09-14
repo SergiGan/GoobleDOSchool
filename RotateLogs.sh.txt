@@ -24,29 +24,28 @@
 
   $last15Access_Log = find $folder_otherLogs -name "access.log" -mmin -15; 
    
-   sed -i 's/127.0.0.100 ; 192.168.0.100/ /g' $last15Access_log | tar cvzf `backup_ALogs$record-date`.tar.gz $last15Access_log;
+  sed -i 's/127.0.0.100 ; 192.168.0.100/ /g' $last15Access_log | tar cvzf `backup_ALogs$record-date`.tar.gz $last15Access_log;
    
+# 2.Adding last finding otherlogs to archive:
+
+  $otherLogs = $(find $folder_otherLogs -name "*.log" -mmin -360 --exclude="access.log");
+     
+  sed -i 's/127.0.0.100 ; 192.168.0.100/ /g' $folder_otherLogs | tar cvzf `backup_OLogs$record-date`.tar.gz $folder_otherLogs;
    
 # 2.Renaming the substrings format:
   # зам≥нити п≥др€дки формату "$md5hash_of_record-date$username", де record-date у формат≥ ddmmyy,
   # а username Ч "2-3symbols@domain.name", на "*****"
 
-    echo sed -i '/$md5hash_of_record-date$username/*****/g' $folder_otherLogs; 
+  echo sed -i '/$md5hash_of_record-date$username/*****/g' $folder_otherLogs; 
 
 
-# 2.Adding last finding otherlogs to archive:
 
-    $otherLogs = $(find $folder_otherLogs -name "*.log" -mmin -360 --exclude="access.log");
-     
-     sed -i 's/127.0.0.100 ; 192.168.0.100/ /g' $folder_otherLogs | tar cvzf `backup_OLogs$record-date`.tar.gz $folder_otherLogs;
-
-# LogsCaput to choose as variant and Sending logs to store after backup:
-        cd / | du -sh * | sort -h ;
-        find /var/log/nginx/ -name "*gz" | xargs -i rm {} ;
+# LogsCaput: to choose as variant after backup and sending logs to store,
+                
 	> /var/log/nginx/access.log;
 	> /var/log/nginx/[custom.log, seo.log, error.log, chunga.log];
         rm -rf /backup/"some_name".tar.gz;
-         				
+        find /var/log/nginx/ -name "*gz" | xargs -i rm {} ; 				
 
 #*******************************************************************************************
 #/tmp/rotateLogs.sh[+] [unix] (21:41 12/09/2021)
